@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenis Gra w JavaScript</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: darkgray;
+        }
+        
+        canvas {
+            border: 3px solid #fff;
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <canvas></canvas>
+    <script>
+        const canvas = document.querySelector('canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = 1000;
+        canvas.height = 500;
+
+        const cw = canvas.width;
+        const ch = canvas.height;
+
+        const ballSize = 20;
+        let ballX = cw / 2 - ballSize / 2;
+        let ballY = ch / 2 - ballSize / 2;
+
+        const paddelHeight = 100;
+        const paddelWidth = 20;
+
+        const playerX = 70;
+        const aiX = 910;
+
+        let playerY = 200;
+        let aiY = 200;
+
+        const lineWidth = 6;
+        const lineHeight = 16;
+
+        let ballSpeedX = 3;
+        let ballSpeedY = 3;
+
+
+
+        function player() {
+            ctx.fillStyle = '#7FFF00';
+            ctx.fillRect(playerX, playerY, paddelWidth, paddelHeight);
+        }
+
+        function ai() {
+            ctx.fillStyle = 'yellow';
+            ctx.fillRect(aiX, aiY, paddelWidth, paddelHeight);
+        }
+
+        function ball() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(ballX, ballY, ballSize, ballSize);
+
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+
+            if (ballY <= 0 || ballY + ballSize >= ch) {
+                ballSpeedY = -ballSpeedY;
+                speedUp();
+            }
+            if (ballX <= 0 || ballX + ballSize >= cw) {
+                ballSpeedX = -ballSpeedX;
+                speedUp();
+            }
+        }
+
+        topCanvas = canvas.offsetTop;
+        console.log(topCanvas);
+
+        function playerPosition(e) {
+            //console.log(" pozycja myszy to " + (e.clientY - topCanvas));
+            playerY = e.clientY - topCanvas - paddelHeight / 2;
+
+            if (playerY >= ch - paddelHeight) {
+                playerY = ch - paddelHeight
+            }
+            if (playerY <= 0) {
+                playerY = 0;
+            }
+
+        }
+
+        function speedUp() {
+
+            if (ballSpeedX > 0 && ballSpeedX < 16) {
+                ballSpeedX += .4;
+            } else if (ballSpeedX < 0 && ballSpeedX > -16) {
+                ballSpeedX -= .4;
+            }
+            // prędkość Y
+            if (ballSpeedY > 0 && ballSpeedY < 16) {
+                ballSpeedY += .2;
+            } else if (ballSpeedY < 0 && ballSpeedY > -16) {
+                ballSpeedY -= .2;
+            }
+        }
+
+        function aiPosition() {
+            var middlePaddel = aiY + paddelHeight / 2;
+            var middleBall = ballY + ballSize / 2;
+
+            if (ballX > 500) {
+                if (middlePaddel - middleBall > 200) {
+                    //console.log("+200");
+                    aiY -= 20;
+                } else if (middlePaddel - middleBall > 50) {
+                    //console.log("+50-200");
+                    aiY -= 10;
+                } else if (middlePaddel - middleBall < -200) {
+                    //console.log("-200");
+                    aiY += 20;
+                } else if (middlePaddel - middleBall < -50) {
+                    //console.log("-50-(-200)");
+                    aiY += 10;
+                }
+            } else if (ballX <= 500 && ballX > 150) {
+                if (middlePaddel - middleBall > 100) {
+                    aiY -= 5;
+                } else if (middlePaddel - middleBall < -100) {
+                    aiY += 5;
+                }
+            }
+        }
+
+        canvas.addEventListener("mousemove", playerPosition);
+
+
+        function table() {
+            //Stół
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, cw, ch);
+            for (let linePosition = 20; linePosition < ch; linePosition += 30) {
+                ctx.fillStyle = "gray"
+                ctx.fillRect(cw / 2 - lineWidth / 2, linePosition, lineWidth, lineHeight);
+
+            }
+
+
+
+        }
+
+        function game() {
+            table()
+            ball()
+            player()
+            ai()
+            aiPosition()
+        }
+
+        setInterval(game, 1000 / 60)
+
+    </script>
+</body>
+
+</html>
